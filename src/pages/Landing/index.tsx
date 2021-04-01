@@ -9,10 +9,10 @@ const Landing: React.FC = () => (
   <div id="page-landing">
     <div id="page-landing-content" className="container">
       <div className="logo-container">
-        <h2>Plataforma de Gerenciamento.</h2>
+        <h2>Plataforma de Gerenciamento Administrativo.</h2>
       </div>
 
-      <div className="buttons-container">
+      {/* <div className="buttons-container">
         <Link to="Adm" className="Adm">
           <img src={admI} alt="adm" />
           ADMINISTRAÇÃO
@@ -25,7 +25,7 @@ const Landing: React.FC = () => (
           {' '}
         </Link>
 
-      </div>
+      </div> */}
       <span className="bembrasil"> Rede Bem Brasil @ 2021</span>
 
     </div>

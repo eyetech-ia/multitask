@@ -31,7 +31,7 @@ const PrivateRoute: React.FC<RouteProps> = ({
       ) : (
         <Redirect
           to={{
-            pathname: isPrivate ? '/' : '/dashboard',
+            pathname: isPrivate ? '/' : '/login',
             state: { from: location },
           }}
         />

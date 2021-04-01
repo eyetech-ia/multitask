@@ -9,10 +9,10 @@ import { useAuth } from '../../hooks/auth';
 import { useToast } from '../../hooks/toast';
 import getValidationErrors from '../../utils/getValidationErrors';
 
-
-
 import { Input, Button } from '../../components';
-import { Container, Content, AnimationContainer, Background } from './styles';
+import {
+  Container, Content, AnimationContainer, Background,
+} from './styles';
 
 interface SignInFormData {
   email: string;
@@ -84,7 +84,7 @@ const SignIn: React.FC = () => {
               placeholder="Senha"
             />
 
-            <Button type="submit">Entrar</Button>
+            <Button htmlType="submit">Entrar</Button>
 
             <Link to="/forgot-password">Esqueci minha senha</Link>
             <Link to="/Formlogin/">Solicitar Acesso</Link>

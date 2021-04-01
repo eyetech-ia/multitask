@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components';
 
+import { Input } from 'antd';
 import Tooltip from '../Tooltip';
 
 interface ContainerProps {
@@ -9,7 +10,6 @@ interface ContainerProps {
 }
 
 export const Container = styled.div<ContainerProps>`
-  background: #232129;
   border-radius: 10px;
   padding: 16px;
   width: 100%;
@@ -20,20 +20,17 @@ export const Container = styled.div<ContainerProps>`
   & + div {
     margin-top: 8px;
   }
-  ${(props) =>
-    props.isErrored &&
-    css`
+  ${(props) => props.isErrored
+    && css`
       border-color: #c53030;
     `}
-  ${(props) =>
-    props.isFocused &&
-    css`
+  ${(props) => props.isFocused
+    && css`
       color: #ff9000;
       border-color: #ff9000;
     `}
-  ${(props) =>
-    props.isFilled &&
-    css`
+  ${(props) => props.isFilled
+    && css`
       color: #ff9000;
     `}
   input {

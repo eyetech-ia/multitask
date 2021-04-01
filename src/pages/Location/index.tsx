@@ -1,29 +1,30 @@
-import {Input, Button, Option} from '../../components';
-import React, { useCallback, useRef, useState, useEffect } from 'react';
+import React, {
+  useCallback, useRef, useState, useEffect,
+} from 'react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 import { Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
+import {
+  Form as AntForm, Table, Tag, Space, Row, Col, Modal, Popconfirm, Alert
+} from 'antd';
+import { FiPlus, FiTrash } from 'react-icons/fi';
+import { PlusCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import styled from 'styled-components';
+import { Input, Button } from '../../components';
 
-import api from '../../services/api';
-
-import { useToast } from '../../hooks/toast';
+import './styles.css';
 
 import getValidationErrors from '../../utils/getValidationErrors';
+import { useToast } from '../../hooks/toast';
+import api from '../../services/api';
 
 interface LocationFormData {
   name: string;
   email: string;
   password: string;
 }
-
-import './styles.css';
-import Select from '../components/Select';
-import Textarea from '../components/Textarea';
-
-// import { Container } from './styles';
-import styled from 'styled-components';
 
 export const Container = styled.div`
   display: flex;
@@ -44,93 +45,181 @@ interface ICep {
 }
 
 const Location: React.FC = () => {
+  const { addToast } = useToast();
+  const history = useHistory();
+  const [disabled, setDisabled] = useState(false);
+  const [modal, showModal] = useState(false);
+  const [locale, setLocale] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [alert, setAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
-    const formRef = useRef<FormHandles>(null);
-    const { addToast } = useToast();
-    const history = useHistory();
-    const [zipCode, setZipCode] = useState<ICep[]>([]);
+  const formRef = useRef<FormHandles>(null);
 
+  useEffect(() => {
+    api.get('locale').then(({ data }) => setLocale(data));
+    setLoading(false);
+  }, [locale]);
 
-    const handleSearchZip = (value: string) => {
-      axios.get(`https://viacep.com.br/ws/${value}/json/`).then((res) =>  {
-        setZipCode(res.data)
-        console.log('cep', res.data)
-      }).catch(err => console.log(err))
-    }
+  const handleViaCep = async () => {
+    const cepValue = formRef.current?.getFieldValue('zipCode');
 
-    const handleSubmit = useCallback(
-      async (data: LocationFormData) => {
-        try {
-          formRef.current?.setErrors({});
+    await axios.get(
+      `https://viacep.com.br/ws/${cepValue}/json/`
+    ).then((res) => {
+      formRef.current?.setFieldValue('street', res.data.logradouro);
+      formRef.current?.setFieldValue('neighborn', res.data.bairro);
+      formRef.current?.setFieldValue('city', res.data.localidade);
+      formRef.current?.setFieldValue('state', res.data.uf);
+      setDisabled(true);
+    }).catch((err) => {
+      setAlert(true);
+      setTimeout(() => {
+        setAlert(false);
+      }, 3000);
+      setAlertMessage('Erro, CEP não encontrado!');
+      setDisabled(false);
+    });
+  };
 
-          const schema = Yup.object().shape({
-            name: Yup.string().required('Nome obrigatório'),
-            zipCode: Yup.string(),
-            street: Yup.string().required('Rua obrigatória'),
-            city: Yup.string().required('Cidade obrigatória'),
-            neighborn: Yup.string().required('Bairro obrigatório'),
+  const handleSubmit = useCallback(
+    async (data: LocationFormData, { reset }) => {
+      try {
+        formRef.current?.setErrors({});
 
-            number: Yup.string().required('Bairro obrigatório'),
+        const schema = Yup.object().shape({
+          name: Yup.string().required('Nome obrigatório'),
+          zipCode: Yup.string(),
+          street: Yup.string().required('Rua obrigatória'),
+          city: Yup.string().required('Cidade obrigatória'),
+          neighborn: Yup.string().required('Bairro obrigatório'),
 
-          });
+          number: Yup.string().required('Bairro obrigatório'),
 
-          await schema.validate(data, {
-            abortEarly: false,
-          });
+        });
 
-          console.log('data', data)
+        await schema.validate(data, {
+          abortEarly: false,
+        });
 
-          await api.post('/locale', data);
+        await api.post('/locale', data);
+        formRef.current?.reset();
 
-          history.push('/');
+        showModal((prevState) => !prevState);
 
-          addToast({
-            type: 'success',
-            title: 'Cadastro realizado!',
-            description: 'Funcionário Cadastrado',
-          });
-        } catch (err) {
-          if (err instanceof Yup.ValidationError) {
-            const errors = getValidationErrors(err);
+        addToast({
+          type: 'success',
+          title: 'Cadastro realizado!',
+          description: 'Funcionário Cadastrado',
+        });
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
 
-            formRef.current?.setErrors(errors);
+          formRef.current?.setErrors(errors);
 
-            return;
-          }
-
-          addToast({
-            type: 'error',
-            title: 'Erro no cadastro',
-            description: 'Ocorreu um erro ao fazer cadastro, tente novamente.',
-          });
+          return;
         }
-      },
-      [addToast, history],
-    );
+
+        addToast({
+          type: 'error',
+          title: 'Erro no cadastro',
+          description: 'Ocorreu um erro ao fazer cadastro, tente novamente.',
+        });
+      }
+    },
+    [addToast, history],
+  );
+
+  const handleModal = () => {
+    showModal((prevState) => !prevState);
+  };
+
+  const columns = [
+    {
+      title: 'Local',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Endereço',
+      dataIndex: 'street',
+      key: 'street',
+    },
+    {
+      title: 'Cidade',
+      dataIndex: 'city',
+      key: 'city',
+    },
+    {
+      title: 'Estado',
+      dataIndex: 'state',
+      key: 'state',
+    },
+    {
+      title: 'Ações',
+      key: 'action',
+      render: () => (
+        <Space size="middle">
+          <Button type="primary" icon={<QuestionCircleOutlined style={{ color: 'red' }} />}>Detalhes</Button>
+          <Button type="primary">Editar</Button>
+          <Popconfirm title="Você tem Certeza?" icon={<QuestionCircleOutlined style={{ color: 'red' }} />}>
+            <Button type="primary" danger>
+              <FiTrash size={20} />
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
 
   return (
-    <Container className="container">
-      <Form ref={formRef} onSubmit={handleSubmit}>
-      <Input name="name" placeholder="Local" />
-      <Input name="zipCode" placeholder="CEP" onBlur={(event) => handleSearchZip(event.target.value)} />
-      <Input name="street" placeholder="Rua" />
-      <Input name="city" placeholder="Cidade" />
-      <Option name="state" label="Estado" options = {[
-      {value: 'Maranhão', label: 'Maranhão'},
-      {value: 'Rio Grande do Sul', label: 'Rio Grande do Sul'},
-      {value: 'São Paulo', label: 'São Paulo'},
-      ]} />
-      <Input name="neighborn" placeholder="Bairro" />
-      <Input name="number" placeholder="Nº" />
 
-      <Button type="submit">
-        Salvar
-      </Button>
-      </Form>
-    </Container>
+    <>
+      <Row style={{ marginBottom: 10 }}>
+        <Button type="primary" icon={<PlusCircleOutlined style={{ color: 'white' }} />} onClick={handleModal} size="middle">
+          Cadastrar Local
+        </Button>
+        <Modal centered title="Cadastrar Local" visible={modal} footer={false} onCancel={() => showModal((prevState) => !prevState)}>
+          <Form ref={formRef} onSubmit={handleSubmit}>
+            {alert && <Alert message={alertMessage} type="error" closable showIcon /> }
+            <AntForm.Item>
+              <Input label="Nome" name="name" placeholder="Local" />
+            </AntForm.Item>
+
+            <AntForm.Item>
+              <Input label="CEP" name="zipCode" type="number" placeholder="CEP" onBlur={handleViaCep} />
+            </AntForm.Item>
+            <AntForm.Item>
+              <Input label="Rua" name="street" placeholder="Rua" disabled={disabled} />
+            </AntForm.Item>
+
+            <AntForm.Item>
+              <Input label="Bairro" name="neighborn" placeholder="Bairro" disabled={disabled} />
+            </AntForm.Item>
+            <AntForm.Item>
+              <Input label="Bairro" name="number" placeholder="Nº" />
+            </AntForm.Item>
+            <AntForm.Item>
+              <Input label="Cidade" name="city" placeholder="Cidade" disabled={disabled} />
+            </AntForm.Item>
+            <AntForm.Item>
+              <Input label="Estado" name="state" placeholder="Estado" disabled={disabled} />
+            </AntForm.Item>
+            <Button type="primary" htmlType="submit">
+              Salvar
+            </Button>
+          </Form>
+        </Modal>
+      </Row>
+      <Row>
+        <Col span={24}>
+          <Table loading={loading} bordered dataSource={locale} columns={columns} />
+        </Col>
+      </Row>
+    </>
+
   );
-}
+};
 
 export default Location;
-
-

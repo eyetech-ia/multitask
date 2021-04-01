@@ -1,5 +1,4 @@
-import React from 'react';
-import { ReactChildren } from 'react';
+import React, { ReactChildren } from 'react';
 
 import { AuthProvider } from './auth';
 import { ToastProvider } from './toast';

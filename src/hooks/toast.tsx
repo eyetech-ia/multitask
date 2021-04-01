@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
-import React, { createContext, useCallback, useContext, useState } from 'react';
-import { ReactChildren } from 'react';
+import React, {
+  createContext, useCallback, useContext, useState,
+} from 'react';
 import { uuid } from 'uuidv4';
 
 import ToastContainer from '../components/ToastContainer';

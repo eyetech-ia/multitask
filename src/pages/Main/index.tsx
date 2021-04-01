@@ -1,73 +1,82 @@
-import React,{useState} from 'react';
+import React, { useState } from 'react';
+import {
+  useHistory, useLocation, Route, Switch, Redirect
+} from 'react-router-dom';
+import {
+  Layout, Button, Row, Col, Breadcrumb, PageHeader, Typography, Avatar
+} from 'antd';
+import { FaAlignCenter } from 'react-icons/fa';
+import { Menu } from '../../components';
 
-// import { Container } from './styles';
-import { Layout, Menu, Button } from 'antd';
-// import './styles.css';
+const {
+  Header, Content, Sider, Footer
+} = Layout;
+const { Title } = Typography;
 
-const { Header, Content, Sider } = Layout;
-const { SubMenu } = Menu;
-const Main: React.FC = () => {
+const Main: React.FC = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
+  const location = useLocation();
+  const history = useHistory();
 
+  const newLocation = location.pathname.split('/');
   function toggleCollapsed() {
     setCollapsed(!collapsed);
   }
   return (
-    <Layout >
-        <Sider trigger={null} collapsible collapsed={collapsed}>
-          <div className="logo" />
-          <Menu
-        defaultSelectedKeys={['1']}
-        defaultOpenKeys={['sub1']}
-        mode="inline"
-        theme="dark"
-        inlineCollapsed={collapsed}
-      >
-        <Menu.Item key="1" >
-          Option 1
-        </Menu.Item>
-        <Menu.Item key="2" >
-          Option 2
-        </Menu.Item>
-        <Menu.Item key="3" >
-          Option 3
-        </Menu.Item>
-        <SubMenu key="sub1" title="Navigation One">
-          <Menu.Item key="5">Option 5</Menu.Item>
-          <Menu.Item key="6">Option 6</Menu.Item>
-          <Menu.Item key="7">Option 7</Menu.Item>
-          <Menu.Item key="8">Option 8</Menu.Item>
-        </SubMenu>
-        <SubMenu key="sub2"  title="Navigation Two">
-          <Menu.Item key="9">Option 9</Menu.Item>
-          <Menu.Item key="10">Option 10</Menu.Item>
-          <SubMenu key="sub3" title="Submenu">
-            <Menu.Item key="11">Option 11</Menu.Item>
-            <Menu.Item key="12">Option 12</Menu.Item>
-          </SubMenu>
-        </SubMenu>
-      </Menu>
+    <Layout className="App" style={{ minHeight: '100vh', overflow: 'auto' }}>
+      <Header>
+        <Button type="primary" onClick={toggleCollapsed}>
+          {collapsed ? <FaAlignCenter /> : <FaAlignCenter /> }
+        </Button>
+      </Header>
+
+      <Layout className="site-layout">
+        <Sider collapsible collapsed={collapsed} onCollapse={toggleCollapsed}>
+          <Menu />
         </Sider>
-        <Layout className="site-layout">
-          <Header className="site-layout-background" style={{ padding: 0 }}>
-      <Button type="primary" onClick={toggleCollapsed} style={{ marginBottom: 16 }}>
-        {collapsed ? 'Fechado' : 'Aberto' }
-      </Button>
-          </Header>
-          <Content
-            className="site-layout-background"
-            style={{
-              margin: '24px 16px',
-              padding: 24,
-              minHeight: 280,
-            }}
-          >
-            Content
-          </Content>
-        </Layout>
-      </Layout>
-  );
+        <Content>
+          {
+            newLocation[0] === ''
+              ? (
+                <PageHeader
+                  className="site-page-header firstLetter"
+                  title={newLocation}
+                >
+                  <Breadcrumb separator=">">
+                    <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
+                    {newLocation.map((item) => <Breadcrumb.Item key={item} className="firstLetter">{item}</Breadcrumb.Item>)}
+                  </Breadcrumb>
+                </PageHeader>
+              )
+              : (
+                <PageHeader
+                  className="site-page-header firstLetter"
+                  title={newLocation}
+                  onBack={() => history.goBack()}
+                >
+                  <Breadcrumb separator=">">
+                    <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
+                    {newLocation.map((item) => <Breadcrumb.Item key={item} className="firstLetter">{item}</Breadcrumb.Item>)}
+                  </Breadcrumb>
+                </PageHeader>
+              )
 }
+          <Row>
+            <Col
+              sm={24}
+              className="mainApp"
+            >
+              {children}
+            </Col>
+          </Row>
+          <Footer>
+            <a href="https://www.eyetech.com">Desenvolvido pela Eyetech</a>
+          </Footer>
+        </Content>
+
+      </Layout>
+    </Layout>
+  );
+};
 
 export default Main;
-

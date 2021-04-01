@@ -1,15 +1,26 @@
-import {Input, Button} from '../../components';
-import React, { useCallback, useRef, useState, useEffect } from 'react';
+import React, {
+  useCallback, useRef, useState, useEffect,
+} from 'react';
+import {
+  Table, Tag, Space, Row, Col, Button, Modal, Popconfirm, TableProps, Form as AntForm
+} from 'antd';
+
+import { FiPlus, FiTrash } from 'react-icons/fi';
+import { PlusCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
+import styled from 'styled-components';
 import api from '../../services/api';
 
 import { useToast } from '../../hooks/toast';
 
 import getValidationErrors from '../../utils/getValidationErrors';
+import { Input, Button as IButton } from '../../components';
+
+import './styles.css';
 
 interface QuestsFormData {
   name: string;
@@ -19,119 +30,162 @@ interface QuestsFormData {
 interface Quests {
   id: number;
   name: string;
+  record: any;
+  key: string;
+  selectedRowKeys: void;
 }
-import styled from 'styled-components';
 export const Container = styled.div`
   display: flex;
   flex:1;
   flex-direction:column;
 `;
 
-import './styles.css';
-
-
 const Quests: React.FC = () => {
+  const { addToast } = useToast();
+  const history = useHistory();
+  const [quests, setQuests] = useState<Quests[]>([]);
+  const [modal, showModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [selectedKeys, setSelectedKeys] = useState([]);
+  const [selectedItem, setSelectedItem] = useState('');
 
-    const formRef = useRef<FormHandles>(null);
-    const { addToast } = useToast();
-    const history = useHistory();
-    const [quests, setQuests] = useState<Quests[]>([]);
+  useEffect(() => {
+    api.get('quest').then(({ data }) => setQuests(data));
+    setLoading(false);
+  }, [quests]);
 
-    useEffect(() => {
-      api.get('quest').then(({ data }) => setQuests(data));
-    }, []);
+  const handleModal = () => {
+    showModal((prevState) => !prevState);
+  };
 
+  const handleModalSelection = () => {
+    showModal((prevState) => !prevState);
+  };
 
-    const handleSubmit = useCallback(
-      async (data: QuestsFormData) => {
-        try {
-          formRef.current?.setErrors({});
+  const formRef = useRef<FormHandles>(null);
 
-          const schema = Yup.object().shape({
-            name: Yup.string().required('Nome obrigatório'),
-          });
+  const handleSubmit = useCallback(
+    async (data: QuestsFormData) => {
+      try {
+        formRef.current?.setErrors({});
 
-          await schema.validate(data, {
-            abortEarly: false,
-          });
+        const schema = Yup.object().shape({
+          name: Yup.string().required('Nome obrigatório'),
+        });
 
-          await api.post('/quest', data);
+        await schema.validate(data, {
+          abortEarly: false,
+        });
 
-          history.push('/adm');
+        await api.post('/quest', data);
 
-          addToast({
-            type: 'success',
-            title: 'Cadastro realizado!',
-            description: 'Você já pode fazer seu logon no MultiAction',
-          });
-        } catch (err) {
-          if (err instanceof Yup.ValidationError) {
-            const errors = getValidationErrors(err);
+        showModal((prevState) => !prevState);
 
-            formRef.current?.setErrors(errors);
+        addToast({
+          type: 'success',
+          title: 'Cadastro realizado!',
+          description: 'Você já pode fazer seu logon no MultiAction',
+        });
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
 
-            return;
-          }
+          formRef.current?.setErrors(errors);
 
-          addToast({
-            type: 'error',
-            title: 'Erro no cadastro',
-            description: 'Ocorreu um erro ao fazer cadastro, tente novamente.',
-          });
+          return;
         }
-      },
-      [addToast, history],
-    );
+
+        addToast({
+          type: 'error',
+          title: 'Erro no cadastro',
+          description: 'Ocorreu um erro ao fazer cadastro, tente novamente.',
+        });
+      }
+    },
+    [addToast, history],
+  );
+
+  interface Keys {
+    record: Array<{
+      key: string;
+    }>;
+    key: string;
+    selectedRowKeys: any;
+  }
+
+  const selectRow = (record: Keys) => {
+    console.log('red', record);
+    // const selectedRowKeys: any = [...selectedKeys];
+    // if (selectedRowKeys.indexOf(record.key) >= 0) {
+    //   selectedRowKeys.splice(selectedRowKeys.indexOf(record.key), 1);
+    // } else {
+    //   selectedRowKeys.push(record.key);
+    // }
+    // setSelectedKeys(selectedRowKeys);
+  };
+  const onSelectedRowKeysChange = (selectedRowKeys: any) => {
+    console.log('sec', selectedRowKeys);
+    setSelectedKeys(selectedRowKeys);
+  };
+
+  const columns = [
+    {
+      title: 'Nome do Questionário',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Ações',
+      key: 'action',
+      render: () => (
+        <Space size="middle">
+          <Button type="primary">Editar</Button>
+          <Button type="primary" onClick={handleModalSelection}>Ver Perguntas</Button>
+          <Popconfirm title="Você tem Certeza?" icon={<QuestionCircleOutlined style={{ color: 'red' }} />}>
+            <Button type="primary" danger>
+              <FiTrash size={20} />
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
+  const rowSelection = {
+    selectedKeys,
+    onChange: onSelectedRowKeysChange
+  };
 
   return (
-    <Container className="container">
+    <>
+      <Row style={{ marginBottom: 10 }}>
+        <Button type="primary" icon={<PlusCircleOutlined style={{ color: 'white' }} />} onClick={handleModal} size="middle">
+          Cadastrar Questionário
+        </Button>
+        <Modal centered title="Cadastrar Questionário" visible={modal} footer={false} onCancel={() => showModal((prevState) => !prevState)}>
+          <Form ref={formRef} onSubmit={handleSubmit}>
+            <AntForm.Item>
+              <Input name="name" placeholder="Nome do Questionário" />
+            </AntForm.Item>
 
-
-
-
-       <Form ref={formRef} onSubmit={handleSubmit}>
-         <h1>Cadastrar Questionário</h1>
-          <Input name="name" placeholder="Nome do Questionário" />
-
-          <Button type="submit">
-            Salvar
-          </Button>
-        </Form>
-
-        <div>
-        <h1>Questionários</h1>
-      <table className="table">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Questionário</th>
-            <th scope="col">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            quests.map(item =>
-              <tr key={item.id}>
-                <th scope="col">{item.id}</th>
-                <th scope="col">{item.name}</th>
-                <th>
-                  <Link
-                    to={`/asks/${item.id}`}
-                    key={item.id}
-                  >Ver Perguntas</Link>
-                </th>
-              </tr>
-            )
-          }
-
-        </tbody>
-</table>
-
-      </div>
-    </Container>
+            <IButton type="primary" htmlType="submit">Salvar</IButton>
+          </Form>
+        </Modal>
+      </Row>
+      <Row>
+        <Col span={24}>
+          <Table
+            loading={loading}
+            rowSelection={rowSelection}
+            bordered
+            dataSource={quests}
+            columns={columns}
+            onRow={(record) => ({ onClick: () => selectRow(record) })}
+          />
+        </Col>
+      </Row>
+    </>
   );
-}
+};
 
 export default Quests;
-
-

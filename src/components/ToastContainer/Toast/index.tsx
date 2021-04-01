@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { ReactNode } from 'react';
+import React, { useEffect, ReactNode } from 'react';
+
 import {
   FiAlertCircle,
   FiCheckCircle,
@@ -14,7 +14,6 @@ import { Container } from './styles';
 interface ToastProps {
   message: ToastMessage;
   style: Record<string, any>;
-  children?: ReactNode;
 }
 
 const icons = {

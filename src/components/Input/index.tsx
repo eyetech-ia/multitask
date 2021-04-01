@@ -1,77 +1,59 @@
+/* eslint-disable no-param-reassign */
 import React, {
-  InputHTMLAttributes,
-  StyleHTMLAttributes,
   useEffect,
   useRef,
   useState,
   useCallback,
 } from 'react';
-import { IconBaseProps } from 'react-icons';
-import { FiAlertCircle } from 'react-icons/fi';
+import { Input as AntInput, InputProps as AntInputProps, Typography } from 'antd';
 import { useField } from '@unform/core';
 
-import { Container, Error } from './styles';
+import { IconBaseProps } from 'react-icons';
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends AntInputProps {
   name: string;
-  containerStyle?: Record<string, any>
+  label?: string;
   icon?: React.ComponentType<IconBaseProps>;
 }
 
-const Input: React.FC<InputProps> = ({
-  name,
-  containerStyle,
-  icon: Icon,
-  ...rest
+const { Text } = Typography;
+
+const Input = ({
+  name, label, icon: Icon, ...rest
 }: InputProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<AntInput>(null);
 
-  const [isFocused, setIsFocused] = useState(false);
-  const [isFilled, setIsFilled] = useState(false);
-
-  const { fieldName, defaultValue, error, registerField } = useField(name);
-
-  const handleInputFocus = useCallback(() => {
-    setIsFocused(true);
-  }, []);
-
-  const handleInputBlur = useCallback(() => {
-    setIsFocused(false);
-
-    setIsFilled(!!inputRef.current?.value);
-  }, []);
+  const {
+    fieldName, defaultValue, error, registerField
+  } = useField(name);
 
   useEffect(() => {
-    registerField({
+    registerField<string>({
       name: fieldName,
       ref: inputRef.current,
-      path: 'value',
+      getValue: (ref) => ref.input.value,
+      setValue: (ref: AntInput, value) => {
+        ref.input.value = value;
+      },
+      clearValue: (ref: AntInput) => {
+        ref.input.value = '';
+      }
     });
   }, [fieldName, registerField]);
 
   return (
-    <Container
-      style={containerStyle}
-      isErrored={!!error}
-      isFilled={isFilled}
-      isFocused={isFocused}
-      data-testid="input-container"
-    >
-      {Icon && <Icon size={20} />}
-      <input
-        onFocus={handleInputFocus}
-        onBlur={handleInputBlur}
-        defaultValue={defaultValue}
+    <>
+      {label && <Text>{label}</Text>}
+      <AntInput
+        style={{ color: '#000' }}
+        prefix={Icon && <Icon size={20} />}
         ref={inputRef}
+        defaultValue={defaultValue}
+        type="text"
         {...rest}
       />
-
-      {error && (
-        <Error title={error}>
-          <FiAlertCircle color="#c53030" size={20} />
-        </Error>
-      )}
-    </Container>
+      {error && <Text type="danger">{error}</Text>}
+    </>
   );
 };
 

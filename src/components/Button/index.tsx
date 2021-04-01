@@ -1,15 +1,20 @@
 import React, { ButtonHTMLAttributes } from 'react';
 
+import { Button as AntButton, ButtonProps as AntButtonProps } from 'antd';
 import { Container } from './styles';
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+interface ButtonProps extends AntButtonProps {
   loading?: boolean;
-};
+}
 
-const Button: React.FC<ButtonProps> = ({ children, loading, ...rest }: ButtonProps) => (
-  <Container type="button" {...rest}>
+const Button: React.FC<ButtonProps> = ({
+  children,
+  loading,
+  ...rest
+}: ButtonProps) => (
+  <AntButton {...rest}>
     {loading ? 'Carregando...' : children}
-  </Container>
+  </AntButton>
 );
 
 export default Button;

@@ -1,47 +1,51 @@
-
-import React, { FC, SelectHTMLAttributes, useRef, useEffect } from 'react';
-import { FiChevronDown } from 'react-icons/fi';
+import React, { useRef, useEffect } from 'react';
+import ReactSelect, {
+  OptionTypeBase,
+  Props as SelectProps,
+} from 'react-select';
 import { useField } from '@unform/core';
+import { Typography } from 'antd';
 
-import { Container } from './styles';
-
-interface ISelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
-  label: string;
+const { Text } = Typography;
+interface Props extends SelectProps<OptionTypeBase> {
   name: string;
-  options: Array<{
-    value: string;
-    label: string;
-  }>;
+  label?: string;
 }
-
-const Select: FC<ISelectProps> = ({ label, name, options, ...rest } : ISelectProps) => {
-  const selectRef = useRef<HTMLSelectElement>(null);
-  const { fieldName, defaultValue, error, registerField } = useField(name);
-
+const Select = ({ label, name, ...rest }: Props) => {
+  const selectRef = useRef(null);
+  const {
+    fieldName, defaultValue, registerField, error
+  } = useField(name);
   useEffect(() => {
     registerField({
       name: fieldName,
       ref: selectRef.current,
-      path: 'value',
+      getValue: (ref: any) => {
+        if (rest.isMulti) {
+          if (!ref.state.value) {
+            return [];
+          }
+          return ref.state.value.map((option: OptionTypeBase) => option.value);
+        }
+        if (!ref.state.value) {
+          return '';
+        }
+        return ref.state.value.value;
+      },
     });
-  }, [fieldName, registerField]);
-
+  }, [fieldName, registerField, rest.isMulti]);
   return (
-    <Container>
-      <label htmlFor={name}>{label}</label>
-      <select defaultValue="" id={name} ref={selectRef} {...rest}>
-        <option value="" disabled hidden>
-          Selecione uma opção
-        </option>
-
-        {options.map(({ label: opLabel, value }) => (
-          <option key={value} value={value}>
-            {opLabel}
-          </option>
-        ))}
-      </select>
-      <FiChevronDown size={28} />
-    </Container>
+    <>
+      {label && <Text>{label}</Text>}
+      <ReactSelect
+        placeholder="Selecione uma Opção"
+        defaultValue={defaultValue}
+        ref={selectRef}
+        classNamePrefix="react-select"
+        {...rest}
+      />
+      {error && <Text type="danger">{error}</Text>}
+    </>
   );
 };
 

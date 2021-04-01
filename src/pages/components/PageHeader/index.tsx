@@ -8,24 +8,21 @@ interface PageHeaderProps {
     description?: string;
 }
 
-const PageHeader: React.FC <PageHeaderProps> = ({title, description, children}) => {
+const PageHeader: React.FC <PageHeaderProps> = ({ title, description, children }) => (
 
-    return (
+  <header className="page-header">
+    <div className="top-bar-container">
+      <Input type="datetime-local" name="datetime-local" label="DATA/HORA" />
 
-        <header className = "page-header">
-                <div className = "top-bar-container">
-                <Input type="datetime-local" name ="datetime-local" label ="DATA/HORA"/>
+    </div>
+    <div className="header-content">
+      <strong>{title}</strong>
+      {description && <p>{description}</p>}
+      {children}
 
-                </div>
-                <div className = "header-content">
-                    <strong>{title}</strong>
-                    {description && <p>{description}</p>}
-                    {children}
+    </div>
+  </header>
 
-                </div>
-            </header>
-
-    )
-}
+);
 
 export default PageHeader;

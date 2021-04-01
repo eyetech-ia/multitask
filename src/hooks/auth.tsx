@@ -1,4 +1,6 @@
-import React, { createContext, useCallback, useState, useContext } from 'react';
+import React, {
+  createContext, useCallback, useState, useContext,
+} from 'react';
 
 import api from '../services/api';
 
@@ -18,7 +20,6 @@ interface AuthContextData {
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
-
 
 // eslint-disable-next-line react/prop-types
 const AuthProvider: React.FC = ({ children }) => {
@@ -45,7 +46,7 @@ const AuthProvider: React.FC = ({ children }) => {
       email,
       password,
     });
-    console.log('res', response.data)
+    console.log('res', response.data);
 
     const { token } = response.data;
 
@@ -67,7 +68,7 @@ const AuthProvider: React.FC = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token: data.token, signIn, signOut}}
+      value={{ token: data.token, signIn, signOut }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,25 +1,29 @@
-import {Input, Button} from '../../components';
-import React, { useCallback, useRef, useState, useEffect } from 'react';
+/* eslint-disable no-param-reassign */
+import React, {
+  useCallback, useRef, useState, useEffect,
+} from 'react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 import { useHistory, useParams } from 'react-router-dom';
 
+import styled from 'styled-components';
 import api from '../../services/api';
 
 import { useToast } from '../../hooks/toast';
 
 import getValidationErrors from '../../utils/getValidationErrors';
+import { Input, Button } from '../../components';
 
 interface QuestsFormData {
   name: string;
-  quest_id: string;
+  questId: string;
 }
 interface Quests {
   id: number;
   name: string;
 }
-import styled from 'styled-components';
+
 export const Container = styled.div`
   display: flex;
   flex:1;
@@ -29,7 +33,7 @@ export const Container = styled.div`
 interface AskParams {
   id: string;
 }
-const Asks: React.FC = () =>  {
+const Asks: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const { addToast } = useToast();
   const history = useHistory();
@@ -39,7 +43,6 @@ const Asks: React.FC = () =>  {
   useEffect(() => {
     api.get(`ask/${id}`).then(({ data }) => setAsks(data));
   }, []);
-
 
   const handleSubmit = useCallback(
     async (data: QuestsFormData) => {
@@ -53,10 +56,10 @@ const Asks: React.FC = () =>  {
         await schema.validate(data, {
           abortEarly: false,
         });
-        data.quest_id = id
+        data.questId = id;
         await api.post('/ask', data);
 
-        history.push(`/quest`);
+        history.push('/quest');
 
         addToast({
           type: 'success',
@@ -82,42 +85,42 @@ const Asks: React.FC = () =>  {
   );
 
   return (
-      <Container className="container">
-        <Form ref={formRef} onSubmit={handleSubmit}>
-         <h1>Cadastrar Pergunta no questionário</h1>
-          <Input name="name" placeholder="Pergunta" />
+    <Container className="container">
+      <Form ref={formRef} onSubmit={handleSubmit}>
+        <h1>Cadastrar Pergunta no questionário</h1>
+        <Input name="name" placeholder="Pergunta" />
 
-          <Button type="submit">
-            Salvar
-          </Button>
-        </Form>
+        <Button htmlType="submit">
+          Salvar
+        </Button>
+      </Form>
 
-        <div>
+      <div>
         <h1>Perguntas</h1>
-      <table className="table">
-        <thead>
-          <tr>
-            <th scope="col">Código</th>
-            <th scope="col">Pergunta</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            asks.map(item =>
+        <table className="table">
+          <thead>
+            <tr>
+              <th scope="col">Código</th>
+              <th scope="col">Pergunta</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+            asks.map((item) => (
               <tr key={item.id}>
                 <th scope="col">{item.id}</th>
                 <th scope="col">{item.name}</th>
               </tr>
-            )
+            ))
           }
 
-        </tbody>
-</table>
+          </tbody>
+        </table>
 
       </div>
-        </Container>
+    </Container>
 
-  )
-}
+  );
+};
 
 export default Asks;

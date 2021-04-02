@@ -8,7 +8,7 @@ import PrivateRoute from './Route';
 const Routes: React.FC = () => (
   <Switch>
     <PrivateRoute exact path="/login" component={SignIn} />
-    <Redirect to="/login" />
+    {/* <Redirect to="/login" /> */}
 
     <Main>
       <PrivateRoute exact path="/" component={Landing} isPrivate />

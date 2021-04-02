@@ -24,9 +24,8 @@ const PrivateRoute: React.FC<RouteProps> = ({
     <ReactDOMRoute
       {...rest}
       render={({ location }) => (isPrivate === !!token ? (
-        <Main>
-          <Component />
-        </Main>
+
+        <Component />
 
       ) : (
         <Redirect

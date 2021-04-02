@@ -4,7 +4,7 @@ import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 import { Link, useHistory } from 'react-router-dom';
-
+import { Form as AntdForm, Typography } from 'antd';
 import { useAuth } from '../../hooks/auth';
 import { useToast } from '../../hooks/toast';
 import getValidationErrors from '../../utils/getValidationErrors';
@@ -13,6 +13,8 @@ import { Input, Button } from '../../components';
 import {
   Container, Content, AnimationContainer, Background,
 } from './styles';
+
+const { Text } = Typography;
 
 interface SignInFormData {
   email: string;
@@ -76,18 +78,23 @@ const SignIn: React.FC = () => {
           <Form ref={formRef} onSubmit={handleSubmit}>
             <h1>Rede BEM BRASIL</h1>
 
-            <Input name="email" icon={FiMail} placeholder="E-mail" />
-            <Input
-              name="password"
-              icon={FiLock}
-              type="password"
-              placeholder="Senha"
-            />
+            <AntdForm.Item>
+              <Input name="email" icon={FiMail} placeholder="E-mail" />
+            </AntdForm.Item>
+            <AntdForm.Item>
+              <Input
+                name="password"
+                icon={FiLock}
+                type="password"
+                placeholder="Senha"
+              />
+            </AntdForm.Item>
 
-            <Button htmlType="submit">Entrar</Button>
+            <Button type="primary" htmlType="submit">Entrar</Button>
 
-            <Link to="/forgot-password">Esqueci minha senha</Link>
-            <Link to="/Formlogin/">Solicitar Acesso</Link>
+            <Link to="/forgot-password"><Text>Esqueci minha senha</Text></Link>
+
+            {/* <Link to="/Formlogin/">Solicitar Acesso</Link> */}
           </Form>
 
         </AnimationContainer>

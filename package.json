@@ -36,11 +36,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "CI= react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "gcp-build": "npm run build",
-    "deploy": "gcloud config set project bb-multiaction && gcloud app deploy app.yml --version=0-1-0"
+    "eject": "react-scripts eject"
   },
   "browserslist": {
     "production": [

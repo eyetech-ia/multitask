@@ -1,14 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { ConfigProvider } from 'antd';
+import ptBR from 'antd/lib/locale/pt_BR';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 require('react-web-vector-icons/fonts');
 
 ReactDOM.render(
-  <React.StrictMode>
+  <ConfigProvider locale={ptBR}>
     <App />
-  </React.StrictMode>,
+  </ConfigProvider>,
   document.getElementById('root')
 );
 

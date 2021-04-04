@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable camelcase */
 import React, {
   useCallback, useRef, useState, useEffect
@@ -7,7 +8,7 @@ import { Form } from '@unform/web';
 import * as Yup from 'yup';
 import { useHistory } from 'react-router-dom';
 import {
-  Table, Space, Row, Col, Modal, Button, Popconfirm, Form as AntForm
+  Table, Space, Row, Col, Modal, Button, Popconfirm, Form as AntForm, Tag
 } from 'antd';
 import { FiTrash } from 'react-icons/fi';
 import { PlusCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
@@ -27,6 +28,16 @@ interface EmployeeFormData {
   cpf: string;
   cargo: string;
   locale_id: string;
+}
+
+interface ILocale {
+  name: string
+}
+
+interface Locale {
+  id: string;
+  name: string;
+  locale: ILocale;
 }
 
 const Employee: React.FC = () => {
@@ -119,23 +130,16 @@ const Employee: React.FC = () => {
     },
     {
       title: 'Local',
-      dataIndex: 'locale_id',
-      key: 'locale_id',
-    },
-    {
-      title: 'Ações',
-      key: 'action',
-      render: () => (
+      key: 'locale',
+      render: (record: Locale) => (
         <Space size="middle">
-          <Button type="primary">Editar</Button>
-          <Popconfirm title="Você tem Certeza?" icon={<QuestionCircleOutlined style={{ color: 'red' }} />}>
-            <Button type="primary" danger>
-              <FiTrash size={20} />
-            </Button>
-          </Popconfirm>
+          <Tag color="geekblue">
+            {record.locale.name}
+          </Tag>
         </Space>
       ),
     },
+
   ];
 
   return (

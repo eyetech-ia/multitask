@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-param-reassign */
 import React, {
   useEffect,
@@ -14,12 +15,17 @@ interface InputProps extends AntInputProps {
   name: string;
   label?: string;
   icon?: React.ComponentType<IconBaseProps>;
+  searchable?: boolean
+  onSearch?: () => void;
+  loading?: boolean
+  enterButton?: string;
 }
 
+const { Search } = AntInput;
 const { Text } = Typography;
 
 const Input = ({
-  name, label, icon: Icon, ...rest
+  name, label, icon: Icon, searchable, loading, enterButton, ...rest
 }: InputProps) => {
   const inputRef = useRef<AntInput>(null);
 
@@ -44,14 +50,34 @@ const Input = ({
   return (
     <>
       {label && <Text>{label}</Text>}
-      <AntInput
-        style={{ color: '#000' }}
-        prefix={Icon && <Icon size={20} />}
-        ref={inputRef}
-        defaultValue={defaultValue}
-        type="text"
-        {...rest}
-      />
+
+      {
+        searchable
+          ? (
+            <AntInput.Search
+              style={{ color: '#000' }}
+              prefix={Icon && <Icon size={20} />}
+              ref={inputRef}
+              defaultValue={defaultValue}
+              type="text"
+              {...rest}
+              loading={loading}
+              enterButton={enterButton}
+
+            />
+          )
+          : (
+            <AntInput
+              style={{ color: '#000' }}
+              prefix={Icon && <Icon size={20} />}
+              ref={inputRef}
+              defaultValue={defaultValue}
+              type="text"
+              {...rest}
+            />
+          )
+      }
+
       {error && <Text type="danger">{error}</Text>}
     </>
   );

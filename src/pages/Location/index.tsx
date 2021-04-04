@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
 import React, {
   useCallback, useRef, useState, useEffect,
 } from 'react';
@@ -7,7 +8,7 @@ import * as Yup from 'yup';
 import { Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import {
-  Form as AntForm, Table, Tag, Space, Row, Col, Modal, Popconfirm, Alert
+  Form as AntForm, Table, Tag, Space, Row, Col, Modal, Popconfirm, Alert, notification
 } from 'antd';
 import { FiPlus, FiTrash } from 'react-icons/fi';
 import { PlusCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
@@ -16,7 +17,8 @@ import { Input, Button } from '../../components';
 
 import './styles.css';
 
-import getValidationErrors from '../../utils/getValidationErrors';
+import { getValidationErrors } from '../../utils';
+
 import { useToast } from '../../hooks/toast';
 import api from '../../services/api';
 
@@ -32,16 +34,20 @@ export const Container = styled.div`
   flex-direction: column;
 `;
 
-interface ICep {
-  cep: string;
-  logradouro: string;
-  complemento: string;
-  bairro: string;
-  uf: string;
-  ibge: string;
-  gia: string;
-  ddd: string;
-  siafi: string;
+interface Cep {
+  logradouro: string ;
+  bairro: string | undefined ;
+  localidade: string ;
+  uf: string ;
+}
+
+interface ILocale {
+  id: string;
+  name: string ;
+  address: string;
+  zipCode: string;
+  city: string;
+  state: string;
 }
 
 const Location: React.FC = () => {
@@ -49,37 +55,53 @@ const Location: React.FC = () => {
   const history = useHistory();
   const [disabled, setDisabled] = useState(false);
   const [modal, showModal] = useState(false);
-  const [locale, setLocale] = useState([]);
+  const [detailsModal, showDetailsModal] = useState(false);
+  const [locale, setLocale] = useState<ILocale[]>([]);
   const [loading, setLoading] = useState(true);
-  const [alert, setAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
+  const [selectedCep, setSelectedCep] = useState<Cep>();
+
+  const [selectedRecord, setSelectedRecord] = useState<ILocale>();
 
   const formRef = useRef<FormHandles>(null);
 
-  useEffect(() => {
-    api.get('locale').then(({ data }) => setLocale(data));
+  const fetchLocale = async () => {
+    api.get('locale').then((res) => setLocale(res.data));
     setLoading(false);
-  }, [locale]);
+  };
+  useEffect(() => {
+    fetchLocale();
+  }, []);
 
   const handleViaCep = async () => {
     const cepValue = formRef.current?.getFieldValue('zipCode');
-
-    await axios.get(
-      `https://viacep.com.br/ws/${cepValue}/json/`
-    ).then((res) => {
-      formRef.current?.setFieldValue('street', res.data.logradouro);
-      formRef.current?.setFieldValue('neighborn', res.data.bairro);
-      formRef.current?.setFieldValue('city', res.data.localidade);
-      formRef.current?.setFieldValue('state', res.data.uf);
-      setDisabled(true);
-    }).catch((err) => {
-      setAlert(true);
-      setTimeout(() => {
-        setAlert(false);
-      }, 3000);
-      setAlertMessage('Erro, CEP não encontrado!');
-      setDisabled(false);
-    });
+    setLoading(true);
+    if (cepValue.length === 8) {
+      try {
+        setLoading(true);
+        await axios.get(
+          `https://viacep.com.br/ws/${cepValue}/json/`
+        ).then((res) => {
+          setSelectedCep(res.data);
+          setDisabled(true);
+        }).finally(() => {
+          setLoading(false);
+        });
+      } catch (err) {
+        notification.error({
+          message: 'Erro!',
+          description:
+            'Cep não encontrado!',
+        });
+        setDisabled(false);
+        setLoading(false);
+      }
+    } else {
+      notification.error({
+        message: 'Erro!',
+        description:
+          'Cep inválido, digite o padrão sem o traço!',
+      });
+    }
   };
 
   const handleSubmit = useCallback(
@@ -107,10 +129,10 @@ const Location: React.FC = () => {
 
         showModal((prevState) => !prevState);
 
-        addToast({
-          type: 'success',
-          title: 'Cadastro realizado!',
-          description: 'Funcionário Cadastrado',
+        notification.success({
+          message: 'Sucesso!',
+          description:
+            'Local cadastrado com sucesso!',
         });
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
@@ -133,6 +155,28 @@ const Location: React.FC = () => {
 
   const handleModal = () => {
     showModal((prevState) => !prevState);
+  };
+
+  const handleDeleteRecord = (idRecord: string) => {
+    api.delete(`locale/${idRecord}`).then(() => {
+      notification.success({
+        message: 'Sucesso!',
+        description:
+          'Item Removido!',
+      });
+    }).catch((err) => {
+      notification.error({
+        message: 'Erro!',
+        description: err.message,
+      });
+    });
+  };
+
+  const handleShowDetails = (idRecord: string) => {
+    showDetailsModal((prevState) => !prevState);
+    api.get(`locale/${idRecord}`).then((res) => {
+      setSelectedRecord(res.data);
+    }).catch((err) => console.log('err', err));
   };
 
   const columns = [
@@ -159,11 +203,16 @@ const Location: React.FC = () => {
     {
       title: 'Ações',
       key: 'action',
-      render: () => (
+      render: (_: string, record: ILocale) => (
         <Space size="middle">
-          <Button type="primary" icon={<QuestionCircleOutlined style={{ color: 'red' }} />}>Detalhes</Button>
-          <Button type="primary">Editar</Button>
-          <Popconfirm title="Você tem Certeza?" icon={<QuestionCircleOutlined style={{ color: 'red' }} />}>
+          <Button type="primary" onClick={() => handleShowDetails(record.id)}>Detalhes</Button>
+
+          {/* <Button type="primary">Editar</Button> */}
+          <Popconfirm
+            title="Você tem Certeza?"
+            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+            onConfirm={() => handleDeleteRecord(record.id)}
+          >
             <Button type="primary" danger>
               <FiTrash size={20} />
             </Button>
@@ -171,6 +220,7 @@ const Location: React.FC = () => {
         </Space>
       ),
     },
+
   ];
 
   return (
@@ -182,39 +232,77 @@ const Location: React.FC = () => {
         </Button>
         <Modal centered title="Cadastrar Local" visible={modal} footer={false} onCancel={() => showModal((prevState) => !prevState)}>
           <Form ref={formRef} onSubmit={handleSubmit}>
-            {alert && <Alert message={alertMessage} type="error" closable showIcon /> }
             <AntForm.Item>
               <Input label="Nome" name="name" placeholder="Local" />
             </AntForm.Item>
 
             <AntForm.Item>
-              <Input label="CEP" name="zipCode" type="number" placeholder="CEP" onBlur={handleViaCep} />
+              <Input label="CEP" name="zipCode" type="number" placeholder="CEP" searchable onSearch={handleViaCep} loading={loading} enterButton="Buscar Endereço" />
             </AntForm.Item>
             <AntForm.Item>
-              <Input label="Rua" name="street" placeholder="Rua" disabled={disabled} />
+              <Input label="Rua" name="street" placeholder="Rua" disabled={disabled} value={selectedCep?.logradouro} />
             </AntForm.Item>
+            <Row gutter={12}>
+              <Col span={12}>
+                <AntForm.Item label="Bairro">
+                  <Input name="neighborn" placeholder="Bairro" disabled={disabled} value={selectedCep?.bairro} />
+                </AntForm.Item>
+              </Col>
+              <Col span={12}>
+                <AntForm.Item label="Número">
+                  <Input name="number" placeholder="Nº" />
+                </AntForm.Item>
 
-            <AntForm.Item>
-              <Input label="Bairro" name="neighborn" placeholder="Bairro" disabled={disabled} />
-            </AntForm.Item>
-            <AntForm.Item>
-              <Input label="Bairro" name="number" placeholder="Nº" />
-            </AntForm.Item>
-            <AntForm.Item>
-              <Input label="Cidade" name="city" placeholder="Cidade" disabled={disabled} />
-            </AntForm.Item>
-            <AntForm.Item>
-              <Input label="Estado" name="state" placeholder="Estado" disabled={disabled} />
-            </AntForm.Item>
+              </Col>
+            </Row>
+            <Row gutter={12}>
+              <Col span={12}>
+                <AntForm.Item>
+                  <Input label="Cidade" name="city" placeholder="Cidade" disabled={disabled} value={selectedCep?.localidade} />
+                </AntForm.Item>
+              </Col>
+
+              <Col span={12}>
+                <AntForm.Item>
+                  <Input label="Estado" name="state" placeholder="Estado" disabled={disabled} value={selectedCep?.uf} />
+                </AntForm.Item>
+              </Col>
+            </Row>
             <Button type="primary" htmlType="submit">
               Salvar
             </Button>
           </Form>
         </Modal>
+        {selectedRecord && (
+          <Modal centered title="Detalhes do Local" visible={detailsModal} footer={false} onCancel={() => showDetailsModal((prevState) => !prevState)}>
+            <Row>
+              <p>
+                Local:
+                {' '}
+                {selectedRecord.name}
+              </p>
+            </Row>
+            <Row>
+              <p>
+                Endereço:
+                {' '}
+                {selectedRecord.address}
+              </p>
+            </Row>
+            <Row>
+
+              <p>
+                CEP:
+                {' '}
+                {selectedRecord.zipCode}
+              </p>
+            </Row>
+          </Modal>
+        )}
       </Row>
       <Row>
         <Col span={24}>
-          <Table loading={loading} bordered dataSource={locale} columns={columns} />
+          <Table loading={loading} bordered dataSource={locale} columns={columns} rowKey="id" />
         </Col>
       </Row>
     </>

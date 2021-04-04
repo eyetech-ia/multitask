@@ -1,79 +1,39 @@
 import React, { useState } from 'react';
-import {
-  useHistory, useLocation, Route, Switch, Redirect
-} from 'react-router-dom';
-import {
-  Layout, Button, Row, Col, Breadcrumb, PageHeader, Typography, Avatar
-} from 'antd';
-import { FaAlignCenter } from 'react-icons/fa';
+import { Layout, Breadcrumb } from 'antd';
 import { Menu } from '../../components';
+import './styles.css';
+import logo from '../../assets/images/logo-bem-brasil.png';
 
 const {
-  Header, Content, Sider, Footer
+  Header, Content, Footer, Sider
 } = Layout;
-const { Title } = Typography;
 
 const Main: React.FC = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const location = useLocation();
-  const history = useHistory();
+  const handleOnCollapse = () => {
+    setCollapsed((prevState) => !prevState);
+  };
 
-  const newLocation = location.pathname.split('/');
-  function toggleCollapsed() {
-    setCollapsed(!collapsed);
-  }
   return (
-    <Layout className="App" style={{ minHeight: '100vh', overflow: 'auto' }}>
-      <Header>
-        <Button type="primary" onClick={toggleCollapsed}>
-          {collapsed ? <FaAlignCenter /> : <FaAlignCenter /> }
-        </Button>
-      </Header>
-
+    <Layout style={{ minHeight: '100vh' }}>
+      <Sider collapsible collapsed={collapsed} onCollapse={handleOnCollapse}>
+        <div className="logo">
+          <img src={logo} alt="Bem Brasil" />
+        </div>
+        <Menu />
+      </Sider>
       <Layout className="site-layout">
-        <Sider collapsible collapsed={collapsed} onCollapse={toggleCollapsed}>
-          <Menu />
-        </Sider>
-        <Content>
-          {
-            newLocation[0] === ''
-              ? (
-                <PageHeader
-                  className="site-page-header firstLetter"
-                  title={newLocation}
-                >
-                  <Breadcrumb separator=">">
-                    <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
-                    {newLocation.map((item) => <Breadcrumb.Item key={item} className="firstLetter">{item}</Breadcrumb.Item>)}
-                  </Breadcrumb>
-                </PageHeader>
-              )
-              : (
-                <PageHeader
-                  className="site-page-header firstLetter"
-                  title={newLocation}
-                  onBack={() => history.goBack()}
-                >
-                  <Breadcrumb separator=">">
-                    <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
-                    {newLocation.map((item) => <Breadcrumb.Item key={item} className="firstLetter">{item}</Breadcrumb.Item>)}
-                  </Breadcrumb>
-                </PageHeader>
-              )
-}
-          <Row>
-            <Col
-              sm={24}
-              className="mainApp"
-            >
-              {children}
-            </Col>
-          </Row>
-          <Footer>
-            <a href="https://www.eyetech.com">Desenvolvido pela Eyetech</a>
-          </Footer>
+        <Header className="site-layout-background" style={{ padding: 0 }} />
+        <Content style={{ margin: '0 16px' }}>
+          <Breadcrumb style={{ margin: '16px 0' }}>
+            <Breadcrumb.Item>User</Breadcrumb.Item>
+            <Breadcrumb.Item>Bill</Breadcrumb.Item>
+          </Breadcrumb>
+          <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
+            {children}
+          </div>
         </Content>
-
+        <Footer style={{ textAlign: 'center' }}>Bem Brasil Multiserviços ©2021 Desenvolvido Pela EyeTech </Footer>
       </Layout>
     </Layout>
   );

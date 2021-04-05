@@ -83,6 +83,7 @@ const Employee: React.FC = () => {
         });
 
         await api.post('/users', data);
+        formRef.current?.reset();
         showModal((prevState) => !prevState);
         addToast({
           type: 'success',

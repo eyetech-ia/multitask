@@ -13,10 +13,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 150px;
+  height: 130px;
   background: rgba(255, 255, 255, 0.3) ;
 }
 .logo img {
-  width: auto;
-  height: auto;
+  max-width: 100%;
+  max-height: 100%;
 }

@@ -151,6 +151,7 @@ const Quests: React.FC = () => {
           abortEarly: false,
         });
 
+        formRef.current?.reset();
         await api.post('/ask', data);
 
         setModalItemSelection((prevState) => !prevState);

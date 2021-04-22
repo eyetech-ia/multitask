@@ -12,6 +12,7 @@ import {
 } from 'antd';
 import { FiTrash } from 'react-icons/fi';
 import { PlusCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { AxiosError } from 'axios';
 import api from '../../services/api';
 
 import { useToast } from '../../hooks/toast';
@@ -19,7 +20,6 @@ import { useToast } from '../../hooks/toast';
 import getValidationErrors from '../../utils/getValidationErrors';
 
 import { Input, Button as IButton, Option } from '../../components';
-import './styles.css';
 
 interface EmployeeFormData {
   name: string;
@@ -42,7 +42,6 @@ interface Locale {
 
 const Employee: React.FC = () => {
   const { addToast } = useToast();
-  const history = useHistory();
   const [modal, showModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [locale, setLocale] = useState([]);
@@ -62,52 +61,53 @@ const Employee: React.FC = () => {
     });
   }, [employee]);
   const formRef = useRef<FormHandles>(null);
-  const handleSubmit = useCallback(
-    async (data: EmployeeFormData) => {
-      try {
-        formRef.current?.setErrors({});
 
-        const schema = Yup.object().shape({
-          name: Yup.string().required('Nome obrigatório'),
-          cpf: Yup.string().required('CPF Obrigatório'),
-          email: Yup.string()
-            .required('E-mail obrigatório')
-            .email('Digite um e-mail válido'),
-          cargo: Yup.string().required('Cargo Obrigatório'),
-          locale_id: Yup.string().required('Local Obrigatório'),
-          password: Yup.string().min(6, 'No mínimo 6 dígitos'),
-        });
+  async function handleSubmit(data: EmployeeFormData, reset: any) {
+    try {
+      formRef.current?.setErrors({});
 
-        await schema.validate(data, {
-          abortEarly: false,
-        });
+      const schema = Yup.object().shape({
+        name: Yup.string().required('Nome obrigatório'),
+        cpf: Yup.string().required('CPF Obrigatório'),
+        email: Yup.string()
+          .required('E-mail obrigatório')
+          .email('Digite um e-mail válido'),
+        cargo: Yup.string().required('Cargo Obrigatório'),
+        locale_id: Yup.string().required('Local Obrigatório'),
+        password: Yup.string().min(6, 'No mínimo 6 dígitos'),
+      });
 
-        await api.post('/users', data);
-        formRef.current?.reset();
-        showModal((prevState) => !prevState);
-        addToast({
-          type: 'success',
-          title: 'Cadastro realizado!',
-          description: 'Funcionário Cadastrado',
-        });
-      } catch (err) {
-        if (err instanceof Yup.ValidationError) {
-          const errors = getValidationErrors(err);
+      await schema.validate(data, {
+        abortEarly: false,
+      });
 
-          formRef.current?.setErrors(errors);
-
-          console.log(err);
-          return;
-        }
-        addToast({
-          type: 'error',
-          title: 'Erro no cadastro',
-          description: 'Ocorreu um erro ao fazer cadastro, tente novamente.',
-        });
+      await api.post('/users', data);
+      reset();
+      showModal((prevState) => !prevState);
+      addToast({
+        type: 'success',
+        title: 'Cadastro realizado!',
+        description: 'Funcionário Cadastrado',
+      });
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+        formRef.current?.setErrors(errors);
+        return;
       }
-    },
-    [addToast, history],
-  );
+
+      // if (err as AxiosError) {
+      //   const errors = getValidationErrors(err);
+      //   formRef.current?.setErrors(errors);
+      //   return;
+      // }
+      addToast({
+        type: 'error',
+        title: 'Erro no cadastro',
+        description: 'Ocorreu um erro ao fazer cadastro, tente novamente.',
+      });
+    }
+  }
   const handleModal = () => {
     showModal((prevState) => !prevState);
   };

@@ -6,3 +6,5 @@ export { default as Employee } from './Employee';
 export { default as Landing } from './Landing';
 export { default as Ask } from './Asks';
 export { default as Main } from './Main';
+
+export { default as Cities } from './Cities';

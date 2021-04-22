@@ -15,8 +15,6 @@ import { PlusCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import { Input, Button } from '../../components';
 
-import './styles.css';
-
 import { getValidationErrors } from '../../utils';
 
 import { useToast } from '../../hooks/toast';
@@ -104,51 +102,55 @@ const Location: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (data: LocationFormData, { reset } : any) => {
-    try {
-      formRef.current?.setErrors({});
+  const handleSubmit = useCallback(
+    async (data: LocationFormData, { reset }) => {
+      try {
+        formRef.current?.setErrors({});
 
-      const schema = Yup.object().shape({
-        name: Yup.string().required('Nome obrigatório'),
-        zipCode: Yup.string(),
-        street: Yup.string().required('Rua obrigatória'),
-        city: Yup.string().required('Cidade obrigatória'),
-        neighborn: Yup.string().required('Bairro obrigatório'),
+        const schema = Yup.object().shape({
+          name: Yup.string().required('Nome obrigatório'),
+          zipCode: Yup.string(),
+          street: Yup.string().required('Rua obrigatória'),
+          city: Yup.string().required('Cidade obrigatória'),
+          neighborn: Yup.string().required('Bairro obrigatório'),
 
-        number: Yup.string().required('Bairro obrigatório'),
+          number: Yup.string().required('Bairro obrigatório'),
 
-      });
+        });
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
+        await schema.validate(data, {
+          abortEarly: false,
+        });
 
-      await api.post('/locale', data);
-      reset();
+        await api.post('/locale', data);
+        formRef.current?.reset();
 
-      showModal((prevState) => !prevState);
+        showModal((prevState) => !prevState);
 
-      notification.success({
-        message: 'Sucesso!',
-        description:
+        notification.success({
+          message: 'Sucesso!',
+          description:
             'Local cadastrado com sucesso!',
-      });
-    } catch (err) {
-      if (err instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(err);
+        });
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
 
-        formRef.current?.setErrors(errors);
+          formRef.current?.setErrors(errors);
 
-        return;
+          return;
+        }
+
+        addToast({
+          type: 'error',
+          title: 'Erro no cadastro',
+          description: 'Ocorreu um erro ao fazer cadastro, tente novamente.',
+        });
       }
+    },
+    [addToast, history],
+  );
 
-      addToast({
-        type: 'error',
-        title: 'Erro no cadastro',
-        description: 'Ocorreu um erro ao fazer cadastro, tente novamente.',
-      });
-    }
-  };
   const handleModal = () => {
     showModal((prevState) => !prevState);
   };

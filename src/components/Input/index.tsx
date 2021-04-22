@@ -37,13 +37,13 @@ const Input = ({
     registerField<string>({
       name: fieldName,
       ref: inputRef.current,
-      getValue: (ref) => ref.input.value,
-      setValue: (ref: AntInput, value) => {
+      getValue: (ref: AntInput) => ref.input.value,
+      setValue: (ref: AntInput, value: string) => {
         ref.input.value = value;
       },
       clearValue: (ref: AntInput) => {
         ref.input.value = '';
-      }
+      },
     });
   }, [fieldName, registerField]);
 

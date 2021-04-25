@@ -18,7 +18,6 @@ const Routes: React.FC = () => (
       <PrivateRoute path="/questionarios" component={Quests} isPrivate />
       <PrivateRoute path="/dashboard" component={Landing} isPrivate />
       <PrivateRoute path="/perguntas" component={Ask} isPrivate />
-      <Redirect to="/entrar" />
     </Main>
 
   </Switch>

@@ -134,8 +134,8 @@ const Employee: React.FC = () => {
       key: 'locale',
       render: (record: Locale) => (
         <Space size="middle">
-          <Tag color="geekblue">
-            {record.locale.name}
+          <Tag color={record.locale ? 'geekblue' : 'red'}>
+            {record.locale ? record.locale.name : 'Sem local Cadastrado!'}
           </Tag>
         </Space>
       ),

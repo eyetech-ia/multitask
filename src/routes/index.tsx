@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch } from 'react-router-dom';
+import { Redirect, Switch } from 'react-router-dom';
 import {
   Activate, Ask, Employee, Landing, Location, Main, Quests, SignIn, SignUp
 } from '../pages';
@@ -8,7 +8,6 @@ import PrivateRoute from './Route';
 const Routes: React.FC = () => (
   <Switch>
     <PrivateRoute exact path="/entrar" component={SignIn} />
-    {/* <Redirect to="/login" /> */}
     <PrivateRoute path="/ativar-cadastro" component={Activate} />
     <PrivateRoute path="/cadastrar" component={SignUp} />
 
@@ -19,6 +18,7 @@ const Routes: React.FC = () => (
       <PrivateRoute path="/questionarios" component={Quests} isPrivate />
       <PrivateRoute path="/dashboard" component={Landing} isPrivate />
       <PrivateRoute path="/perguntas" component={Ask} isPrivate />
+      <Redirect to="/entrar" />
     </Main>
 
   </Switch>

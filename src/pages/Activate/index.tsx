@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Breadcrumb,
-  Button,
-  Col, Form as AntForm, Layout, Modal, Row, Table
-} from 'antd';
+import { Button, Layout, notification } from 'antd';
 
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
@@ -34,12 +30,19 @@ const Activate: React.FC = () => {
     const token = query.get('token');
     api.post('/activate-user', {
       token
-    }).catch((res) => setMessages(res.data.message));
+    }).catch((res) => {
+      notification.error({
+        message: 'Erro!',
+        description:
+          res.response.data.message,
+      });
+    });
   }
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Content style={{ margin: '0 16px' }}>
+
         <div
           className="site-layout-background"
           style={{

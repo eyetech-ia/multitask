@@ -1,19 +1,17 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import React, {
-  useCallback, useRef, useState, useEffect,
-} from 'react';
+import React, { useEffect, useRef, useState, } from 'react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import {
-  Form as AntForm, Table, Tag, Space, Row, Col, Modal, Popconfirm, Alert, notification
+  Col, Form as AntForm, Modal, notification, Popconfirm, Row, Space, Table
 } from 'antd';
-import { FiPlus, FiTrash } from 'react-icons/fi';
+import { FiTrash } from 'react-icons/fi';
 import { PlusCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
-import { Input, Button } from '../../components';
+import { Button, Input } from '../../components';
 
 import './styles.css';
 

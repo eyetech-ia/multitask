@@ -48,13 +48,14 @@ const SignIn: React.FC = () => {
         await signIn({
           email: data.email,
           password: data.password,
-        }).catch((response) => {
-          addToast({
-            type: 'error',
-            title: 'Erro na autenticação',
-            description: response.response.data.message,
-          });
         });
+        //   .catch((response) => {
+        //   addToast({
+        //     type: 'error',
+        //     title: 'Erro na autenticação',
+        //     description: response.response.data.message,
+        //   });
+        // });
 
         history.push('/dashboard');
       } catch (err) {
@@ -69,7 +70,7 @@ const SignIn: React.FC = () => {
         addToast({
           type: 'error',
           title: 'Erro na autenticação',
-          description: 'Ocorreu um erro ao fazer login, cheque as credenciais.',
+          description: err.response.data.message,
         });
       }
     },

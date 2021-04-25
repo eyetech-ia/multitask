@@ -10,6 +10,8 @@ import { Menu, ProfileMenu } from '../../components';
 import './styles.css';
 import logo from '../../assets/images/logo-bem-brasil.png';
 
+import { useAuth } from '../../hooks/auth';
+
 const {
   Header, Content, Footer, Sider
 } = Layout;
@@ -72,6 +74,7 @@ const DropMenu = () => (
 
 const Main: React.FC = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
+  const { user } = useAuth();
   const handleOnCollapse = () => {
     setCollapsed((prevState) => !prevState);
   };
@@ -92,7 +95,7 @@ const Main: React.FC = ({ children }) => {
               <Dropdown overlay={<DropMenu />} trigger={['click', 'hover']}>
                 <StyledProfileMenu>
                   <Avatar shape="circle" icon={<UserOutlined />} style={{ marginRight: 5 }} />
-                  <StyledUserFullname>Administrador</StyledUserFullname>
+                  <StyledUserFullname>{user.name}</StyledUserFullname>
                   <DownOutlined style={{ marginLeft: 15 }} />
                 </StyledProfileMenu>
               </Dropdown>
@@ -102,8 +105,8 @@ const Main: React.FC = ({ children }) => {
         </Header>
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
+            <Breadcrumb.Item>Bem Brasil</Breadcrumb.Item>
+            <Breadcrumb.Item>Multiaction</Breadcrumb.Item>
           </Breadcrumb>
           <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
             {children}

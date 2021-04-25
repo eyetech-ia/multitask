@@ -1,25 +1,20 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable camelcase */
-import React, {
-  useCallback, useRef, useState, useEffect
-} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
-import { useHistory } from 'react-router-dom';
 import {
-  Table, Space, Row, Col, Modal, Button, Popconfirm, Form as AntForm, Tag
+  Button, Col, Form as AntForm, Modal, Row, Space, Table, Tag
 } from 'antd';
-import { FiTrash } from 'react-icons/fi';
-import { PlusCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { AxiosError } from 'axios';
+import { PlusCircleOutlined } from '@ant-design/icons';
 import api from '../../services/api';
 
 import { useToast } from '../../hooks/toast';
 
 import getValidationErrors from '../../utils/getValidationErrors';
 
-import { Input, Button as IButton, Option } from '../../components';
+import { Button as IButton, Input, Option } from '../../components';
 
 interface EmployeeFormData {
   name: string;
@@ -53,7 +48,7 @@ const Employee: React.FC = () => {
 
     api.get('locale').then((res) => {
       setLocale(
-        res.data.map((loc : any) => ({
+        res.data.map((loc: any) => ({
           label: loc.name,
           value: loc.id,
         })),
@@ -62,7 +57,7 @@ const Employee: React.FC = () => {
   }, [employee]);
   const formRef = useRef<FormHandles>(null);
 
-  async function handleSubmit(data: EmployeeFormData, reset: any) {
+  async function handleSubmit(data: EmployeeFormData) {
     try {
       formRef.current?.setErrors({});
 
@@ -76,13 +71,11 @@ const Employee: React.FC = () => {
         locale_id: Yup.string().required('Local Obrigatório'),
         password: Yup.string().min(6, 'No mínimo 6 dígitos'),
       });
-
       await schema.validate(data, {
         abortEarly: false,
       });
 
       await api.post('/users', data);
-      reset();
       showModal((prevState) => !prevState);
       addToast({
         type: 'success',
@@ -95,12 +88,6 @@ const Employee: React.FC = () => {
         formRef.current?.setErrors(errors);
         return;
       }
-
-      // if (err as AxiosError) {
-      //   const errors = getValidationErrors(err);
-      //   formRef.current?.setErrors(errors);
-      //   return;
-      // }
       addToast({
         type: 'error',
         title: 'Erro no cadastro',
@@ -108,6 +95,7 @@ const Employee: React.FC = () => {
       });
     }
   }
+
   const handleModal = () => {
     showModal((prevState) => !prevState);
   };
@@ -146,10 +134,21 @@ const Employee: React.FC = () => {
   return (
     <>
       <Row style={{ marginBottom: 10 }}>
-        <Button type="primary" icon={<PlusCircleOutlined style={{ color: 'white' }} />} onClick={handleModal} size="middle">
+        <Button
+          type="primary"
+          icon={<PlusCircleOutlined style={{ color: 'white' }} />}
+          onClick={handleModal}
+          size="middle"
+        >
           Cadastrar Funcionário
         </Button>
-        <Modal centered title="Cadastrar Funcionário" visible={modal} footer={false} onCancel={() => showModal((prevState) => !prevState)}>
+        <Modal
+          centered
+          title="Cadastrar Funcionário"
+          visible={modal}
+          footer={false}
+          onCancel={() => showModal((prevState) => !prevState)}
+        >
           <Form ref={formRef} onSubmit={handleSubmit}>
             <AntForm.Item>
               <Input label="Nome" name="name" type="text" placeholder="Nome Completo" />

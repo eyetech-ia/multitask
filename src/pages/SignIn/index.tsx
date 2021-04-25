@@ -48,6 +48,12 @@ const SignIn: React.FC = () => {
         await signIn({
           email: data.email,
           password: data.password,
+        }).catch((response) => {
+          addToast({
+            type: 'error',
+            title: 'Erro na autenticação',
+            description: response.response.data.message,
+          });
         });
 
         history.push('/dashboard');
@@ -92,9 +98,9 @@ const SignIn: React.FC = () => {
 
             <Button type="primary" htmlType="submit">Entrar</Button>
 
-            <Link to="/forgot-password"><Text>Esqueci minha senha</Text></Link>
+            <Link to="/esqueci-a-senha"><Text>Esqueci minha senha</Text></Link>
 
-            {/* <Link to="/Formlogin/">Solicitar Acesso</Link> */}
+            <Link to="/cadastro"><Text>Solicitar Acesso</Text></Link>
           </Form>
 
         </AnimationContainer>

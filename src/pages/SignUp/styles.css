@@ -1,13 +1,10 @@
-
-
-#page-form-login {
+#page-func-form {
 
     width: 100vw;
     height: 100vh;
 }
 
 #search-func button{
-
     width: 16rem;
     height: 6rem;
     background: var(--color-secundary);
@@ -30,13 +27,13 @@
 }
 
 
-#page-form-login .page-header .header-content {
+#page-func-form .page-header .header-content {
 
     margin-bottom: 6.4rem;
 
 }
 
-#page-form-login  main {
+#page-func-form main {
 
     background: var(--color-box-base);
     width: 100%;
@@ -47,18 +44,18 @@
     overflow: hidden;
 }
 
-#page-form-login  main fieldset {
+#page-func-form main fieldset {
 
     border: 0;
     padding: 0 2.4rem;
 }
 
-#page-form-login  main fieldset + fieldset {
+#page-func-form main fieldset + fieldset {
 
     margin-top: 6.4rem;
 }
 
-#page-form-login  main fieldset legend {
+#page-func-form main fieldset legend {
 
     font: 700 2.4rem Archivo;
     color: var(--color-text-title);
@@ -71,12 +68,12 @@
     border-bottom: 1px solid var(--color-line-in-white);
 }
 
-#page-form-login  main fieldset .input-block + .textarea-block,
-#page-form-login  main fieldset .select-block + .input-block{
+#page-func-form main fieldset .input-block + .textarea-block,
+#page-func-form main fieldset .select-block + .input-block{
 
     margin-top: 2.4rem;
 }
-#page-form-login  main footer {
+#page-func-form main footer {
 
     Padding: 4rem 2.4rem;
     background: var(--color-box-footer);
@@ -87,7 +84,7 @@
 
 
 
-#page-form-login  main footer p{
+#page-func-form main footer p{
 
     display: flex;
     align-items: center;
@@ -99,7 +96,7 @@
 
 }
 
-#page-form-login  main footer button {
+#page-func-form main footer button {
 
     width: 100%;
     height: 5.4rem;
@@ -115,11 +112,11 @@
     text-decoration: none;
     transition: background-color 0.2s;
     margin-top: 3.2rem;
-    
+
 }
 
-#page-form-login  main footer button:hover {
-    background: #4169E1;
+#page-func-form main footer button:hover {
+    background: yellowgreen;
 
 }
 
@@ -127,21 +124,21 @@
 
 @media (min-width: 700px) {
 
-    #page-form-login  {
+    #page-func-form {
         max-width: 100vw;
     }
 
-    #page-form-login  .page-header .header-content{
+    #page-func-form .page-header .header-content{
 
         margin-bottom: 0;
 
     }
 
-    #page-form-login  main fieldset {
+    #page-func-form main fieldset {
         padding: 0 6.4rem;
     }
 
-    #page-form-login  main footer {
+    #page-func-form main footer {
 
         padding: 4.0rem 6.4rem;
         display: flex;
@@ -149,17 +146,17 @@
         justify-content: space-between;
     }
 
-    #page-form-login  main footer p{
+    #page-func-form main footer p{
         justify-content: space-between;
     }
 
-    #page-form-login  main footer button {
+    #page-func-form main footer button {
         width: 20rem;
         margin-top: 0;
     }
 
-    #page-form-login  main fieldset legend {
-    
+    #page-func-form main fieldset legend {
+
         align-items: center;
         justify-content: center;
         height: 10rem;

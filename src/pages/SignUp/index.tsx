@@ -1,110 +1,150 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
-import { Link, useHistory } from 'react-router-dom';
-import { Input } from '../../components';
-
-import api from '../../services/api';
-
+import { useHistory } from 'react-router-dom';
+import { Form as AntForm } from 'antd';
 import { useToast } from '../../hooks/toast';
-
 import getValidationErrors from '../../utils/getValidationErrors';
 
-import './styles.css';
+import { Button, Input, Option } from '../../components';
+import {
+  AnimationContainer, Background, Container, Content,
+} from './styles';
 
-interface SignUpFormData {
+/* eslint-disable react/destructuring-assignment */
+/* eslint-disable camelcase */
+import api from '../../services/api';
+
+interface EmployeeFormData {
   name: string;
   email: string;
   password: string;
+  cpf: string;
+  cargo: string;
+  locale_id: string;
 }
 
-// import { Container } from './styles';
-
-const SignUp: React.FC = () => {
+interface ILocale {
+  name: string
+}
+const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+  const [locale, setLocale] = useState<ILocale[]>([]);
+
   const { addToast } = useToast();
+
   const history = useHistory();
 
-  const handleSubmit = useCallback(
-    async (data: SignUpFormData) => {
-      try {
-        formRef.current?.setErrors({});
+  useEffect(() => {
+    api.get('locale').then((res) => {
+      setLocale(
+        res.data.map((loc : any) => ({
+          label: loc.name,
+          value: loc.id,
+        })),
+      );
+    });
+  }, [locale]);
 
-        const schema = Yup.object().shape({
-          name: Yup.string().required('Nome obrigatório'),
-          email: Yup.string()
-            .required('E-mail obrigatório')
-            .email('Digite um e-mail válido'),
-          password: Yup.string().min(6, 'No mínimo 6 dígitos'),
-        });
+  async function handleSubmit(data: EmployeeFormData, reset: any) {
+    try {
+      formRef.current?.setErrors({});
 
-        await schema.validate(data, {
-          abortEarly: false,
-        });
+      const schema = Yup.object().shape({
+        name: Yup.string().required('Nome obrigatório'),
+        cpf: Yup.string().required('CPF Obrigatório'),
+        email: Yup.string()
+          .required('E-mail obrigatório')
+          .email('Digite um e-mail válido'),
+        cargo: Yup.string().required('Cargo Obrigatório'),
+        locale_id: Yup.string().required('Local Obrigatório'),
+        password: Yup.string().min(6, 'No mínimo 6 dígitos'),
+      });
 
-        await api.post('/users', data);
+      await schema.validate(data, {
+        abortEarly: false,
+      });
 
-        history.push('/');
-
-        addToast({
-          type: 'success',
-          title: 'Cadastro realizado!',
-          description: 'Você já pode fazer seu logon no MultiAction',
-        });
-      } catch (err) {
-        if (err instanceof Yup.ValidationError) {
-          const errors = getValidationErrors(err);
-
-          formRef.current?.setErrors(errors);
-
-          return;
-        }
-
-        addToast({
-          type: 'error',
-          title: 'Erro no cadastro',
-          description: 'Ocorreu um erro ao fazer cadastro, tente novamente.',
-        });
+      await api.post('/users', data);
+      reset();
+      addToast({
+        type: 'success',
+        title: 'Cadastro realizado!',
+        description: 'Funcionário Cadastrado',
+      });
+      history.push('/login');
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+        formRef.current?.setErrors(errors);
+        return;
       }
-    },
-    [addToast, history],
-  );
-
+      addToast({
+        type: 'error',
+        title: 'Erro no cadastro',
+        description: 'Ocorreu um erro ao fazer cadastro, tente novamente.',
+      });
+    }
+  }
   return (
-    <div id="page-form-login" className="container">
-      <main>
-        <footer>
-          <fieldset>
-            <Form ref={formRef} onSubmit={() => { console.log('okja'); }}>
-              <legend>Solicitar Acesso</legend>
-              <Input name="name" placeholder="Nome" />
-              <Input name="email" type="email" placeholder="Digite seu email" />
-              <Input name="cargo" placeholder="Cargo" />
-              <legend />
-              <button type="button">
-                ENVIAR
-              </button>
+    <Container>
+      <Content>
+        <AnimationContainer>
 
-            </Form>
+          <Form ref={formRef} onSubmit={handleSubmit}>
+            <h1>Bem Brasil | Multiaction</h1>
 
-          </fieldset>
+            <AntForm.Item>
+              <Input label="Nome" name="name" type="text" placeholder="Nome Completo" />
+            </AntForm.Item>
+            <AntForm.Item>
+              <Input label="CPF" name="cpf" type="text" placeholder="Digite seu CPF" />
+            </AntForm.Item>
+            <AntForm.Item>
+              <Input label="Email" name="email" type="email" placeholder="Digite seu Email" />
+            </AntForm.Item>
+            <AntForm.Item>
+              <Input label="Senha" name="password" type="password" placeholder="Digite sua senha" />
+            </AntForm.Item>
 
-        </footer>
+            <AntForm.Item>
+              <Input
+                name="birthdate"
+                type="date"
+                placeholder="Digite a data do seu Nascimento"
+              />
+            </AntForm.Item>
+            <AntForm.Item>
+              <Option
+                name="cargo"
+                label="Cargo"
+                options={[
+                  { value: 'Supervisor', label: 'Supervisor' },
+                  { value: 'Preposto', label: 'Preposto' },
+                  { value: 'Fiscal', label: 'Fiscal' },
+                  { value: 'Funcionário', label: 'Funcionário' },
+                ]}
+              />
+            </AntForm.Item>
+            <AntForm.Item>
+              <Option
+                name="locale_id"
+                label="Local"
+                options={locale}
+              />
+            </AntForm.Item>
 
-        <footer>
-          <p>
-            Aguarde!
-            {' '}
-            <br />
-            Você receberá um EMAIL de confirmação!
-          </p>
+            <Button type="primary" htmlType="submit">Solicitar Acesso</Button>
 
-        </footer>
+          </Form>
 
-      </main>
-    </div>
+        </AnimationContainer>
+      </Content>
+
+      <Background />
+    </Container>
   );
 };
 
-export default SignUp;
+export default SignIn;

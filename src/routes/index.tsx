@@ -7,19 +7,17 @@ import PrivateRoute from './Route';
 
 const Routes: React.FC = () => (
   <Switch>
-    <PrivateRoute exact path="/login" component={SignIn} />
+    <PrivateRoute exact path="/entrar" component={SignIn} />
     {/* <Redirect to="/login" /> */}
     <PrivateRoute path="/ativar-cadastro" component={Activate} />
-    <PrivateRoute path="/signup" component={SignUp} />
+    <PrivateRoute path="/cadastrar" component={SignUp} />
 
     <Main>
       <PrivateRoute exact path="/" component={Landing} isPrivate />
-
-      <PrivateRoute path="/funcionarios" component={Employee} />
+      <PrivateRoute path="/funcionarios" component={Employee} isPrivate />
       <PrivateRoute path="/locais" component={Location} isPrivate />
       <PrivateRoute path="/questionarios" component={Quests} isPrivate />
       <PrivateRoute path="/dashboard" component={Landing} isPrivate />
-
       <PrivateRoute path="/perguntas" component={Ask} isPrivate />
     </Main>
 

@@ -17,19 +17,19 @@ const PrivateRoute: React.FC<RouteProps> = ({
   component: Component,
   ...rest
 }: RouteProps) => {
-  const { token } = useAuth();
+  const { user } = useAuth();
 
   return (
     <ReactDOMRoute
       {...rest}
-      render={({ location }) => (isPrivate === !!token ? (
+      render={({ location }) => (isPrivate === !!user ? (
 
         <Component />
 
       ) : (
         <Redirect
           to={{
-            pathname: isPrivate ? '/login' : '/dashboard',
+            pathname: isPrivate ? '/entrar' : '/dashboard',
             state: { from: location },
           }}
         />

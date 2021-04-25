@@ -26,20 +26,20 @@ interface EmployeeFormData {
 }
 
 interface ILocale {
+  id: string;
   name: string
 }
+
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const [locale, setLocale] = useState<ILocale[]>([]);
-
   const { addToast } = useToast();
-
   const history = useHistory();
 
   useEffect(() => {
     api.get('locale').then((res) => {
       setLocale(
-        res.data.map((loc : any) => ({
+        res.data.map((loc: ILocale) => ({
           label: loc.name,
           value: loc.id,
         })),
@@ -47,10 +47,9 @@ const SignIn: React.FC = () => {
     });
   }, [locale]);
 
-  async function handleSubmit(data: EmployeeFormData, reset: any) {
+  async function handleSubmit(data: EmployeeFormData) {
     try {
       formRef.current?.setErrors({});
-
       const schema = Yup.object().shape({
         name: Yup.string().required('Nome obrigatório'),
         cpf: Yup.string().required('CPF Obrigatório'),
@@ -66,8 +65,8 @@ const SignIn: React.FC = () => {
         abortEarly: false,
       });
 
-      await api.post('/users', data);
-      reset();
+      // eslint-disable-next-line no-console
+      await api.post('/users', data).catch((response) => console.log('res', response));
       addToast({
         type: 'success',
         title: 'Cadastro realizado!',
@@ -87,14 +86,13 @@ const SignIn: React.FC = () => {
       });
     }
   }
+
   return (
     <Container>
       <Content>
         <AnimationContainer>
-
           <Form ref={formRef} onSubmit={handleSubmit}>
             <h1>Bem Brasil | Multiaction</h1>
-
             <AntForm.Item>
               <Input label="Nome" name="name" type="text" placeholder="Nome Completo" />
             </AntForm.Item>

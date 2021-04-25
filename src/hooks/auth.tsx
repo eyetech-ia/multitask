@@ -4,8 +4,18 @@ import React, {
 
 import api from '../services/api';
 
+interface User {
+  id: string;
+  name: string;
+  cpf: string;
+  cargo: string;
+  birthdate: string;
+  email: string;
+}
+
 interface AuthState {
   token: string;
+  user: User;
 }
 
 interface SignInCredentials {
@@ -14,53 +24,53 @@ interface SignInCredentials {
 }
 
 interface AuthContextData {
-  token: string;
+  user: User;
   signIn(credentials: SignInCredentials): Promise<void>;
   signOut(): void;
+  updateUser(user: User): void;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-// eslint-disable-next-line react/prop-types
-const AuthProvider: React.FC = ({ children }) => {
+export const AuthProvider: React.FC = ({ children }) => {
   const [data, setData] = useState<AuthState>(() => {
     const token = localStorage.getItem('@AppCheck:token');
+    const user = localStorage.getItem('@AppCheck:user');
 
-    if (token) {
+    if (token && user) {
       api.defaults.headers.authorization = `Bearer ${token}`;
-
-      return { token };
+      return { token, user: JSON.parse(user) };
     }
 
     return {} as AuthState;
   });
 
+  const signIn = useCallback(async ({ email, password }) => {
+    const response = await api.post('login', { email, password });
+
+    const { token, user } = response.data;
+    localStorage.setItem('@AppCheck:token', token);
+    localStorage.setItem('@AppCheck:user', JSON.stringify(user));
+
+    api.defaults.headers.authorization = `Bearer ${token}`;
+
+    setData({ token, user });
+  }, []);
+
   const signOut = useCallback(() => {
     localStorage.removeItem('@AppCheck:token');
+    localStorage.removeItem('@AppCheck:user');
 
     setData({} as AuthState);
   }, []);
 
-  const signIn = useCallback(async ({ email, password }) => {
-    const response = await api.post('login', {
-      email,
-      password,
-    });
-    console.log('res', response.data);
-
-    const { token } = response.data;
-
-    localStorage.setItem('@AppCheck:token', token);
-
-    api.defaults.headers.authorization = `Bearer ${token}`;
-
-    setData({ token });
-  }, []);
-
   const updateUser = useCallback(
-    () => {
+    (user: User) => {
+      localStorage.setItem('@AppCheck:user', JSON.stringify(user));
+
       setData({
         token: data.token,
+        user,
       });
     },
     [setData, data.token],
@@ -68,17 +78,19 @@ const AuthProvider: React.FC = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token: data.token, signIn, signOut }}
+      value={{
+        user: data.user, signIn, signOut, updateUser
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
 
-function useAuth(): AuthContextData {
+export function useAuth(): AuthContextData {
   const context = useContext(AuthContext);
+
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
 
   return context;
 }
-
-export { AuthProvider, useAuth };

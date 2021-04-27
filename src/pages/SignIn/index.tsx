@@ -23,7 +23,6 @@ interface SignInFormData {
 
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
-
   const { signIn } = useAuth();
   const { addToast } = useToast();
 
@@ -36,8 +35,8 @@ const SignIn: React.FC = () => {
 
         const schema = Yup.object().shape({
           email: Yup.string()
-            .required('E-mail obrigatório')
-            .email('Digite um e-mail válido'),
+            .email('Digite um e-mail válido')
+            .required('E-mail obrigatório'),
           password: Yup.string().required('Senha obrigatória'),
         });
 
@@ -49,13 +48,6 @@ const SignIn: React.FC = () => {
           email: data.email,
           password: data.password,
         });
-        //   .catch((response) => {
-        //   addToast({
-        //     type: 'error',
-        //     title: 'Erro na autenticação',
-        //     description: response.response.data.message,
-        //   });
-        // });
 
         history.push('/dashboard');
       } catch (err) {
@@ -70,7 +62,7 @@ const SignIn: React.FC = () => {
         addToast({
           type: 'error',
           title: 'Erro na autenticação',
-          description: err.response.data.message,
+          description: 'Ocorreu um erro ao fazer login, cheque as credenciais.',
         });
       }
     },
@@ -99,9 +91,9 @@ const SignIn: React.FC = () => {
 
             <Button type="primary" htmlType="submit">Entrar</Button>
 
-            <Link to="/esqueci-a-senha"><Text>Esqueci minha senha</Text></Link>
+            <Link to="/forgot-password"><Text>Esqueci minha senha</Text></Link>
 
-            <Link to="/cadastro"><Text>Solicitar Acesso</Text></Link>
+            <Link to="/cadastrar"><Text>Solicitar Acesso</Text></Link>
           </Form>
 
         </AnimationContainer>

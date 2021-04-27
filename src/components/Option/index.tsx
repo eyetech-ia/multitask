@@ -1,16 +1,16 @@
-import React, { useRef, useEffect } from 'react';
-import ReactSelect, {
-  OptionTypeBase,
-  Props as SelectProps,
-} from 'react-select';
+import React, { useEffect, useRef } from 'react';
+import ReactSelect, { OptionTypeBase, Props as SelectProps, } from 'react-select';
 import { useField } from '@unform/core';
 import { Typography } from 'antd';
 
 const { Text } = Typography;
+
 interface Props extends SelectProps<OptionTypeBase> {
   name: string;
   label?: string;
 }
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const Select = ({ label, name, ...rest }: Props) => {
   const selectRef = useRef(null);
   const {

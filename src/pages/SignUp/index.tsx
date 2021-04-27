@@ -70,9 +70,9 @@ const SignIn: React.FC = () => {
       addToast({
         type: 'success',
         title: 'Cadastro realizado!',
-        description: 'Funcionário Cadastrado',
+        description: 'Verifique seu email para ativar o cadastro',
       });
-      history.push('/login');
+      history.push('/');
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);

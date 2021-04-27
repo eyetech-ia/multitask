@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import {
-  Layout, Breadcrumb, Dropdown, Avatar, Menu as AntMenu, Row, Col
+  Avatar, Breadcrumb, Dropdown, Layout, Menu as AntMenu, Row
 } from 'antd';
-
-import { UserOutlined, DownOutlined } from '@ant-design/icons';
+import { DownOutlined, UserOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
-import { Menu, ProfileMenu } from '../../components';
-
+import { Route, Switch } from 'react-router-dom';
+import { Menu } from '../../components';
 import './styles.css';
 import logo from '../../assets/images/logo-bem-brasil.png';
-
+import {
+  Ask, Employee, Landing, Location, Quests
+} from '../index';
 import { useAuth } from '../../hooks/auth';
+import PrivateRoute from '../../routes/Route';
 
 const {
   Header, Content, Footer, Sider
@@ -74,10 +76,10 @@ const DropMenu = () => (
 
 const Main: React.FC = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const { user } = useAuth();
   const handleOnCollapse = () => {
     setCollapsed((prevState) => !prevState);
   };
+  // const { user } = useAuth();
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -95,13 +97,13 @@ const Main: React.FC = ({ children }) => {
               <Dropdown overlay={<DropMenu />} trigger={['click', 'hover']}>
                 <StyledProfileMenu>
                   <Avatar shape="circle" icon={<UserOutlined />} style={{ marginRight: 5 }} />
-                  <StyledUserFullname>{user.name}</StyledUserFullname>
+                  {/* <StyledUserFullname>{user ? user.name :
+                    'Administrador'}</StyledUserFullname> */}
                   <DownOutlined style={{ marginLeft: 15 }} />
                 </StyledProfileMenu>
               </Dropdown>
             </Item>
           </Row>
-
         </Header>
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>

@@ -1,25 +1,19 @@
 import React from 'react';
-import { Redirect, Switch } from 'react-router-dom';
+import { Switch, Redirect } from 'react-router-dom';
 import {
-  Activate, Ask, Employee, Landing, Location, Main, Quests, SignIn, SignUp
+  Activate, Main, SignIn, SignUp, Landing, Employee, Location, Quests
 } from '../pages';
-import PrivateRoute from './Route';
+import Route from './Route';
 
 const Routes: React.FC = () => (
   <Switch>
-    <PrivateRoute exact path="/entrar" component={SignIn} />
-    <PrivateRoute path="/ativar-cadastro" component={Activate} />
-    <PrivateRoute path="/cadastrar" component={SignUp} />
-
-    <Main>
-      <PrivateRoute exact path="/" component={Landing} isPrivate />
-      <PrivateRoute path="/funcionarios" component={Employee} isPrivate />
-      <PrivateRoute path="/locais" component={Location} isPrivate />
-      <PrivateRoute path="/questionarios" component={Quests} isPrivate />
-      <PrivateRoute path="/dashboard" component={Landing} isPrivate />
-      <PrivateRoute path="/perguntas" component={Ask} isPrivate />
-    </Main>
-
+    <Route path="/cadastrar" component={SignUp} />
+    <Route path="/ativar-cadastro" component={Activate} />
+    <Route exact path="/" component={SignIn} />
+    <Route path="/dashboard" component={Landing} isPrivate />
+    <Route path="/funcionarios" component={Employee} isPrivate />
+    <Route path="/locais" component={Location} isPrivate />
+    <Route path="/questionarios" component={Quests} isPrivate />
   </Switch>
 );
 

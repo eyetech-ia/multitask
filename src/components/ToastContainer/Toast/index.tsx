@@ -1,10 +1,7 @@
-import React, { useEffect, ReactNode } from 'react';
+import React, { useEffect } from 'react';
 
 import {
-  FiAlertCircle,
-  FiCheckCircle,
-  FiInfo,
-  FiXCircle,
+  FiAlertCircle, FiCheckCircle, FiInfo, FiXCircle,
 } from 'react-icons/fi';
 
 import { ToastMessage, useToast } from '../../../hooks/toast';

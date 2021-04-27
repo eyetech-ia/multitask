@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  FiCheckCircle, FiLayers, FiSquare, FiUsers, FiMapPin
+  FiLayers, FiSquare, FiUsers, FiMapPin
 } from 'react-icons/fi';
 import {
   Menu as IMenu
@@ -9,7 +9,7 @@ import {
 import { Link } from 'react-router-dom';
 
 const Menu: React.FC = () => {
-  const [options, setOptions] = useState([
+  const [options] = useState([
     {
       name: 'Dashboard',
       path: '/dashboard',
@@ -20,11 +20,6 @@ const Menu: React.FC = () => {
       path: '/questionarios',
       icon: <FiLayers />
     },
-    // {
-    //   name: 'Perguntas',
-    //   path: '/perguntas',
-    //   icon: <FiCheckCircle />
-    // },
     {
       name: 'Funcionários',
       path: '/funcionarios',

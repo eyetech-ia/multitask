@@ -1,7 +1,6 @@
-import React, { ButtonHTMLAttributes } from 'react';
+import React from 'react';
 
 import { Button as AntButton, ButtonProps as AntButtonProps } from 'antd';
-import { Container } from './styles';
 
 interface ButtonProps extends AntButtonProps {
   loading?: boolean;

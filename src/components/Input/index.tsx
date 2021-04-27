@@ -1,11 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-param-reassign */
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-} from 'react';
+import React, { useEffect, useRef, } from 'react';
 import { Input as AntInput, InputProps as AntInputProps, Typography } from 'antd';
 import { useField } from '@unform/core';
 

@@ -4,6 +4,7 @@ import {
   Route as ReactDOMRoute,
   Redirect
 } from 'react-router-dom';
+import { TokenClass } from 'typescript';
 
 import { useAuth } from '../hooks/auth';
 import { Main } from '../pages';
@@ -18,7 +19,7 @@ const Route: React.FC<IRouteProps> = ({
   component: Component,
   ...rest
 }) => {
-  const { user } = useAuth();
+  const { token } = useAuth();
 
   const Layout = Main;
 
@@ -26,7 +27,7 @@ const Route: React.FC<IRouteProps> = ({
     <ReactDOMRoute
       {...rest}
       render={({ location }) => {
-        if (user && isPrivate) {
+        if (token && isPrivate) {
           return (
             <Layout>
               <Component />
@@ -34,7 +35,7 @@ const Route: React.FC<IRouteProps> = ({
           );
         }
 
-        return isPrivate === !!user ? (
+        return isPrivate === !!token ? (
           <Component />
         ) : (
           <Redirect

@@ -7,7 +7,9 @@ import { Form as AntForm } from 'antd';
 import { useToast } from '../../hooks/toast';
 import getValidationErrors from '../../utils/getValidationErrors';
 
-import { Button, Input, Option } from '../../components';
+import {
+  Button, Input, Option, MaskedInput
+} from '../../components';
 import {
   AnimationContainer, Background, Container, Content,
 } from './styles';
@@ -97,15 +99,14 @@ const SignIn: React.FC = () => {
               <Input label="Nome" name="name" type="text" placeholder="Nome Completo" />
             </AntForm.Item>
             <AntForm.Item>
-              <Input label="CPF" name="cpf" type="text" placeholder="Digite seu CPF" />
+              <MaskedInput label="CPF" name="cpf" mask="111.111.111-11" placeholder="000.000.000-00" />
             </AntForm.Item>
             <AntForm.Item>
               <Input label="Email" name="email" type="email" placeholder="Digite seu Email" />
             </AntForm.Item>
             <AntForm.Item>
-              <Input label="Senha" name="password" type="password" placeholder="Digite sua senha" />
+              <Input label="Senha" name="password" type="password" placeholder="Digite sua senha" min={6} />
             </AntForm.Item>
-
             <AntForm.Item>
               <Input
                 name="birthdate"
@@ -118,10 +119,9 @@ const SignIn: React.FC = () => {
                 name="cargo"
                 label="Cargo"
                 options={[
-                  { value: 'Supervisor', label: 'Supervisor' },
                   { value: 'Preposto', label: 'Preposto' },
                   { value: 'Fiscal', label: 'Fiscal' },
-                  { value: 'Funcionário', label: 'Funcionário' },
+                  { value: 'Supervisor', label: 'Supervisor' },
                 ]}
               />
             </AntForm.Item>

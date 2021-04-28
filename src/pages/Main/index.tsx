@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import {
-  Avatar, Breadcrumb, Dropdown, Layout, Menu as AntMenu, Row
+  Avatar, Breadcrumb, Dropdown, Layout, Menu as AntMenu, Row, Modal,
 } from 'antd';
-import { DownOutlined, UserOutlined } from '@ant-design/icons';
+import { DownOutlined, UserOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import { Route, Switch } from 'react-router-dom';
-import { Menu } from '../../components';
 import './styles.css';
 import logo from '../../assets/images/logo-bem-brasil.png';
 import {
   Ask, Employee, Landing, Location, Quests
 } from '../index';
+import { Menu, Button } from '../../components';
 import { useAuth } from '../../hooks/auth';
-import PrivateRoute from '../../routes/Route';
 
 const {
   Header, Content, Footer, Sider
 } = Layout;
+const { confirm } = Modal;
 
 const StyledMenu = styled('span')`
   user-select: none;
@@ -53,33 +53,34 @@ const Item = styled.div`
   margin-right: 20px;
 `;
 
-const DropMenu = () => (
-  <Menu>
-    <AntMenu.Item>
-      <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-        1st menu item
-      </a>
-    </AntMenu.Item>
-    <AntMenu.Item icon={<DownOutlined />} disabled>
-      <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-        2nd menu item
-      </a>
-    </AntMenu.Item>
-    <AntMenu.Item disabled>
-      <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-        3rd menu item
-      </a>
-    </AntMenu.Item>
-    <AntMenu.Item danger>a danger item</AntMenu.Item>
-  </Menu>
-);
-
 const Main: React.FC = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const handleOnCollapse = () => {
     setCollapsed((prevState) => !prevState);
   };
+  const { signOut } = useAuth();
   // const { user } = useAuth();
+
+  function showConfirm() {
+    confirm({
+      title: 'Deseja sair do sistema?',
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        signOut();
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  }
+
+  const DropMenu = () => (
+    <AntMenu>
+      <AntMenu.Item danger>
+        <Button onClick={showConfirm}>Sair</Button>
+      </AntMenu.Item>
+    </AntMenu>
+  );
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
